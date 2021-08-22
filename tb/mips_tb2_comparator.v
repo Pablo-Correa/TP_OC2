@@ -28,7 +28,7 @@ module Mips_TB;
     );
     
     initial begin
-        #10 $readmemh("../tb/mips_tb2_comparator.hex", mips.FETCH.instr_ram.memory);
+        #10 $readmemh("../tb/mips_tb2_comparator.hex", mips.FETCH.instruction_memory.mem);
 
         $dumpfile("mips_tb2.vcd");
         $dumpvars;

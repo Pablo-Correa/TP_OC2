@@ -1,6 +1,10 @@
 `ifndef MEM_ZERO
 `define MEM_ZERO
 
+/*
+Mem_0: its only purpose is to calculate offest address
+All other parameters are simply sent to Mem_1
+*/
 module Mem_0 (
     input clock,
     input reset,
@@ -44,6 +48,7 @@ module Mem_0 (
             m0_m1_oper <= 1'b1;
             m0_m1_readmem <= mem_m0_readmem;
             m0_m1_writemem <= mem_m0_writemem;
+            // Calculate address by adding offset to base address
             m0_m1_data_addr <= mem_m0_rega + mem_m0_imedext;
             m0_m1_regb <= mem_m0_regb;
             m0_m1_regdest <= mem_m0_regdest;

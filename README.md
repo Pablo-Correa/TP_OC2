@@ -1,5 +1,5 @@
 # TODO:
-* Remover o módulo Ram32, de forma que funcione de forma mais simples, apenas 
+* (OK) Remover o módulo Ram32, de forma que funcione de forma mais simples, apenas 
 como uma lista de instruções
     * Ele é usado em dois locais: no FETCH para memória de instruções e no
     MEM_1 para memória de dados
@@ -7,6 +7,9 @@ como uma lista de instruções
 envolva mexer no controle também
 * Remover as funções de branch, não são necessárias nesse projeto
 * Control deve ler funct7, funct3 e opcode
+* Colocar os estágios de execução com 4 etapas, seja da ALU, seja de memória, 
+seja de multiplicação (que já são 4 por padrão).
+* Fazer os encaminhamentos (grande)
 
 # Observações
 * Muitas variáveis tem nome "xx_yy_variable", o "xx" é um estágio e o "yy" é 

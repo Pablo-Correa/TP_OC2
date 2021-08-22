@@ -22,7 +22,8 @@ module Mips_TB;
     );
 
     initial begin
-        #10 $readmemh("../tb/mips_synth_tb0.hex", mips.FETCH.instr_ram.memory);
+        #10 $readmemh("../tb/mips_synth_tb0.hex", 
+                      mips.FETCH.instruction_memory.mem);
 
         $dumpfile("mips_synth_tb0.vcd");
         $dumpvars;
@@ -32,11 +33,11 @@ module Mips_TB;
             mips.REGISTERS.registers[17],
             mips.REGISTERS.registers[18],
             mips.REGISTERS.registers[19],
-            mips.MEM.MEM_1.data_ram.memory[3],
-            mips.MEM.MEM_1.data_ram.memory[4]
+            mips.MEM.MEM_1.data_memory.mem[3],
+            mips.MEM.MEM_1.data_memory.mem[4]
         );
 
-        #2000 $writememh("mips_synth_tb0_data_out.hex", mips.MEM.MEM_1.data_ram.memory);
+        #2000 $writememh("mips_synth_tb0_data_out.hex", mips.MEM.MEM_1.data_memory.mem);
         #3000 $finish;
     end
 

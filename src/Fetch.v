@@ -2,7 +2,7 @@
 `define FETCH_V
 
 `include "./src/Ram32.v"
-`include "./src/InstrMem.v"
+`include "./src/MemoryModule.v"
 
 /*
 Only outputs are 'if_id_nextpc' and 'if_id_instruc'
@@ -34,7 +34,7 @@ module Fetch (
 
     assign instr_addr = pc[8:2];
 
-    InstrMem instruction_memory (
+    MemoryModule instruction_memory (
         .clk(clock),
         .addr(instr_addr),
         .data(instr_data)

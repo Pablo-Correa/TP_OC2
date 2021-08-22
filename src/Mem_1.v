@@ -1,7 +1,7 @@
 `ifndef MEM_ONE
 `define MEM_ONE
 
-`include "./src/Ram32.v"
+`include "./src/MemoryModule.v"
 
 module Mem_1 (
     input clock,
@@ -29,16 +29,22 @@ module Mem_1 (
 
     wire [31:0] data_data_out;
 
-    Ram data_ram (
-        .clock(clock),
-        .reset(reset),
+    MemoryModule data_memory (
+        .clk(clock),
         .addr(data_addr),
-        .data_in(m0_m1_regb),
-        .data_out(data_data_out),
-        .wre(data_wre),
-        .instr_load(1'b0),
-        .data_load(mem_ram_load)
+        .data(data_data_out)
     );
+
+    // Ram data_ram (
+    //     .clock(clock),
+    //     .reset(reset),
+    //     .addr(data_addr),
+    //     .data_in(m0_m1_regb),
+    //     .data_out(data_data_out),
+    //     .wre(data_wre),
+    //     .instr_load(1'b0),
+    //     .data_load(mem_ram_load)
+    // );
 
     always @(posedge clock or negedge reset) begin
         if (~reset) begin
