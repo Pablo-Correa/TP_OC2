@@ -34,8 +34,8 @@ module Decode (
 
     // Both may be used at Issue to determine which functional unit should be
     // used
-    output reg [5:0] id_iss_op,
-    output reg [5:0] id_iss_funct,
+    output reg [6:0] id_iss_op,
+    output reg [6:0] id_iss_funct,
 
     // Keeps the current instruction
     input id_stall,
@@ -179,7 +179,7 @@ module Decode (
                 id_iss_imedext <= $signed(if_id_instruc[15:0]);
                 id_iss_selregdest <= selregdest;
 
-                id_iss_op <= if_id_instruc[31:26];
+                id_iss_op <= opcode;
                 id_iss_funct <= if_id_instruc[5:0];
 
                 id_iss_addra <= id_reg_addra;
