@@ -27,12 +27,14 @@ module Mips_TB;
     );
 
     initial begin
+        // Coloca as instruções do arquivo na estrutura de memória de instruções
         #10 $readmemh("./tb/mips_dd_tb0.hex", 
                       mips.FETCH.instruction_memory.mem);
-
+        // Faz o dump das formas de onda para análise posterior
         $dumpfile("mips_dd_tb0.vcd");
         $dumpvars;
 
+        // Imprime na tela alguns sinais escolhidos
         $display("\tTime\t\t0\t1\t2");
         $monitor("%d\t%d%d%d", cur_time,
             mips.REGISTERS.registers[0],
@@ -40,6 +42,7 @@ module Mips_TB;
             mips.REGISTERS.registers[2]
         );
 
+        // Termina depois de 100 ticks
         #100 $finish;
     end
 
