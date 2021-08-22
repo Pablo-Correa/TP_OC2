@@ -85,9 +85,24 @@ module Decode (
                              // be discarded. This register keeps track of
                              // when a branch happens.
 
+    // RISC-V Instruction Decoding
+    wire [4:0] rs1, rs2, rd;
+    wire [6:0] opcode;
+    wire [2:0] funct3;
+    wire [9:0] funct;
+    wire [31:0] ImmGen;
+
+    assign opcode = if_id_instruc[6:0];
+    assign rs1    = if_id_instruc[19:15];
+    assign rs2    = if_id_instruc[24:20];
+    assign rd     = if_id_instruc[11:7];
+    assign funct = {if_id_instruc[31:25],if_id_instruc[14:12]};
+    assign funct3 = {if_id_instruc[14:12]};
+
+
     assign id_if_rega = reg_id_ass_dataa;
-    assign id_reg_addra = if_id_instruc[25:21];
-    assign id_reg_addrb = if_id_instruc[20:16];
+    assign id_reg_addra = rs1;
+    assign id_reg_addrb = rs2;
     assign id_if_selpctype = selpctype;
     assign id_if_pcindex = {if_id_nextpc[31:28],if_id_instruc[25:0]<<2'b10};
     assign id_if_pcimd2ext = if_id_nextpc + $signed({{16{if_id_instruc[15]}},if_id_instruc[15:0]}<<2'b10);
@@ -106,7 +121,7 @@ module Decode (
     assign id_ass_waw_write_writereg = writereg;
 
     Comparator COMPARATOR(.a(reg_id_ass_dataa),.b(reg_id_ass_datab),.op(compop),.compout(compout));
-    Control CONTROL(.op(if_id_instruc[31:26]),.fn(if_id_instruc[5:0]),
+    Control CONTROL(.opcode(opcode),.funct3(funct3),.funct7(funct),
                     .selwsource(selwsource),.selregdest(selregdest),.writereg(writereg),
                     .writeov(writeov),.selimregb(selimregb),.selalushift(selalushift),
                     .aluop(aluop),.shiftop(shiftop),.readmem(readmem),.writemem(writemem),

@@ -78,8 +78,10 @@ module Scoreboard (
         end else begin
             for (i=0; i<32; i=i+1) begin
                 // updates the positions of the data
+                // i.e. shift everyone one place to the left
                 rows[i][4:0] = rows[i][4:0] >> 1;
                 if(rows[i][4:0] == 5'b00000) begin
+                    // if everything is 0 in a row,
                     // register is not pending anymore
                     rows[i][7:5] = 3'b0ZZ;
                 end

@@ -2,8 +2,10 @@
 `define CONTROL_V
 
 module Control (
-    input     [5:0]    op,
-    input     [5:0]    fn,
+    input     [6:0]    opcode,
+    input     [2:0]    funct3,
+    input     [6:0]    funct7,
+
     output             selwsource,
     output             selregdest,
     output             writereg,
@@ -25,23 +27,32 @@ module Control (
 
     assign sel = {op,fn};
 
+    // Whether to use an immediate value or a register as the second operand
     assign selimregb = out[20];
+    // ? (used only in branches and jumps)
     assign selbrjumpz = out[19:18];
+    // Represents number of register operands (1 => 3 registers,
+    // 0 => 2 registers)
     assign selregdest = out[17];
+    // Determines whether to write back data from Memory or Execute
     assign selwsource = out[16];
+    // Whether or not the instruction writes to the ARF
     assign writereg = out[15];
+    // If true, the instruction will write to the ARF even if an overflow
+    // happens.
     assign writeov = out[14];
-    assign unsig = out[13];
-    assign shiftop = out[12:11];
-    assign aluop = out[10:8];
-    assign selalushift = out[7];
-    assign compop = out[6:4];
-    assign selpctype = out[3:2];
-    assign readmem = out[1];
-    assign writemem = out[0];
+    // Whether or not to perform an unsigned operation
+    assign unsig = out[13];         
+    assign shiftop = out[12:11];    // Operation from shifter (maybe not needed)
+    assign aluop = out[10:8];       // ALUOP (which is which?)
+    assign selalushift = out[7];    // Use ALU or Shifter (maybe not needed)
+    assign compop = out[6:4];       // Used in breaks, not needed
+    assign selpctype = out[3:2];    // Used in jumps and branches, not needed
+    assign readmem = out[1];        // Read from memory
+    assign writemem = out[0];       // Write on memory
 
     always @(*) begin
-        casex (sel)
+        casex (sel)                   // 098765432109876543210
             12'b000000000100: out <= 21'b0001011X10XXX1XXXXX00;
             12'b000000000110: out <= 21'b0001011X00XXX1XXXXX00;
             12'b000000000111: out <= 21'b0001011X01XXX1XXXXX00;
