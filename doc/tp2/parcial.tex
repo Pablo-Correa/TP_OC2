@@ -1,0 +1,99 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{placeins}
+\usepackage[utf8]{inputenc}
+\usepackage[ruled]{algorithm2e}
+%\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[portuguese]{babel}
+\usepackage[]{amsmath}
+\restylefloat{figure}
+
+\usepackage[adobe-utopia]{mathdesign}
+\usepackage[T1]{fontenc}
+
+% \usepackage{mdframed}
+
+\DeclareGraphicsExtensions{.jpg,.pdf}
+
+\numberwithin{equation}{section}
+
+\title{Relatório - Trabalho Prático 2: Mips I4}
+\author{
+    Eugênio Pacceli
+    \and
+    Jonatas Cavalcante
+    \and
+    Lucas Augusto
+    \and
+    Samuel Oliveira
+    \and
+    Victor Pires Diniz
+}
+
+\begin{document}
+\maketitle
+\begin{center}
+Organização de Computadores 2 - 2º Semestre de 2015
+\end{center}
+
+\section{Introdução}
+
+O segundo trabalho prático do semestre envolve a transformação do processador MIPS com \emph{pipeline} implementado no trabalho anterior em um processador superescalar \textbf{I4}. Esse breve relatório pretende discutir os novos módulos implementados e as mudanças realizadas, entrando em detalhes sobre o funcionamento do processador e sobre as dificuldades encontradas no desenvolvimento.
+
+\section{Mudanças realizadas}
+
+A transformação do MIPS \emph{pipeline} no I4 consiste em, basicamente:
+
+\begin{itemize}
+    \item Dividir o estágio de execução em suas unidades funcionais
+    \item Criar o novo estágio de \emph{Issue}, que encaminha as instruções para as unidades funcionais corretas.
+    \item Implementar uma \emph{Scoreboard}, utilizada para manter controle sobre quais registradores estão sendo escritos e prevenir \emph{hazards} no processador.
+    \item Implementar a unidade de detecção de hazard em si, também utilizada dentro do \emph{Issue}.
+\end{itemize}
+
+As mudanças acima implicam, também, em diversas outras mudanças no funcionamento interno do processador para garantir que a incorporação das novidades ocorra como esperado.
+
+Além disso, foi modificado o módulo externo que lida com a interação entre o processador e as entradas e saídas da \emph{FPGA}, para o momento da síntese do circuito na placa e teste prático.
+
+\subsection{Scoreboard}
+
+O scoreboard foi implementado e funciona como esperado, com duas interfaces assíncronas de leitura (para interação com o detector de hazard) e uma interface síncrona de escrita. Para testar seu funcionamento, o testbench \verb|scoreboard_tb0.v| foi feito, e sua execução gera resultados corretos.
+
+\subsection{Detector de Hazard}
+
+O detector de hazard é um módulo assíncrono que recebe sinais do scoreboard e determina se deve ocorrer um stall no processador, caso a instrução nova provoque um hazard de dados. Sua funcionalidade é testada no testbench \verb|hazarddetector_tb0.v|, que opera apropriadamente.
+
+\subsection{Divisão do estágio de execução}
+
+A divisão do estágio de execução foi, como proposto pela especificação, feita dividindo o módulo em três partes: multiplicação, operações em memória e outras operações (principalmente as operações lógico-aritméticas). Para isso, foram implementados os módulos \verb|Mult.v|, \verb|Mem.v| e \verb|AluMisc.v|, respectivamente.
+
+\subsubsection{Mult.v}
+
+Essa unidade funcional lida com a operação nova de multiplicação, dividida, também, em quatro estágios, como proposto na especificação: \emph{Mult\_0.v}, \emph{Mult\_1.v}, \emph{Mult\_2.v} e \emph{Mult\_3.v}. Para testá-la, foi feito o testbench \verb|mult_tb0.v|, que gera o resultado esperado.
+
+\subsubsection{Mem.v}
+
+Por sua vez, a unidade funcional \emph{Mem.v} trata as instruções de leitura e escrita na memória, dividida em dois estágios reais (\emph{Mem\_0.v} e \emph{Mem\_1.v}) e dois estágios de encaminhamento para o ciclo seguinte, para garantir a execução em ordem.
+
+\subsubsection{AluMisc.v}
+
+Finalmente, \emph{AluMisc.v} lida com as operações da ALU, do \emph{shifter} e outras operações miscelâneas. Apenas um dos seus sub-estágios é realmente funcional, e, portanto, todo o código foi mantido dentro de apenas um arquivo, com os outros três estágios ``falsos'' dentro dele, também. O testbench \verb|alumisc_tb0.v| testa brevemente sua funcionalidade e opera dentro do esperado para com sua saída.
+
+\subsection{Issue}
+
+O novo estágio de \emph{Issue} recebe como entrada os sinais obtidos no \emph{Decode} e instancia internamente o detector de \emph{hazards} e o scoreboard. Ele é responsável por determinar qual unidade funcional corresponde a qual instrução e por repassar os sinais apropriados para cada unidade. Além disso, ele deve reagir apropriadamente aos sinais do detector de hazard, enviando o sinal de stall para os estágios anteriores, e também deve escrever no scoreboard quando a instrução atual realiza uma escrita de registrador.
+
+\subsection{Outras mudanças}
+
+Como comentado previamente, foi necessário alterar diversos sinais nos módulos antigos do processador para garantir o bom funcionamento das novidades. Em particular, o módulo de \emph{Decode} e \emph{Writeback} tiveram seus sinais de entrada e saída modificados, para enviar para o novo \emph{Issue} e receber dados das unidades funcionais. No que cabe ao \emph{Writeback}, foi necessário também permitir que ele recebesse de apenas uma das três unidades funcionais a cada ciclo, de forma mutuamente exclusiva.
+
+\section{Problemas que persistem}
+
+O processador ainda não funciona como um todo. Há problemas na interação entre o \emph{Decode}, o \emph{Issue} e o banco de registradores. No momento, há suspeitas de que isso ocorra devido à interação entre interfaces síncronas e assíncronas, mas não foi possível encontrar o bug ainda. Por esse motivo, não foi possível garantir ainda, também, o funcionamento correto do \emph{Issue} e do \emph{Decode}. Também por esse motivo não há certeza quanto à correção das modificações feitas no \verb|mips_synth.v|, que lida com a síntese na FPGA.
+
+\section{Conclusão}
+
+Nesse relatório, foram detalhadas as mudanças realizadas no processador MIPS para transformá-lo num processador superescalar em ordem. O trabalho não foi concluído ainda com êxito, mas os problemas citados na seção anterior estão sendo resolvidos no momento, e a versão funcional será enviada assim que estiver pronta. Pedimos desculpas pelo atraso no envio dessa versão incompleta, assim como pelas dificuldades encontradas durante o processo de desenvolvimento e teste.
+
+\end{document}
