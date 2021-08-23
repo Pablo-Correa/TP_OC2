@@ -3,10 +3,10 @@
 como uma lista de instruções
     * Ele é usado em dois locais: no FETCH para memória de instruções e no
     MEM_1 para memória de dados
-* Transformar o decode para que leia instruções do RISCV e não do MIPS. Talvez
+* (WIP) Transformar o decode para que leia instruções do RISCV e não do MIPS. Talvez
 envolva mexer no controle também
 * Remover as funções de branch, não são necessárias nesse projeto
-* Control deve ler funct7, funct3 e opcode
+* (OK) Control deve ler funct7, funct3 e opcode
 * Colocar os estágios de execução com 4 etapas, seja da ALU, seja de memória, 
 seja de multiplicação (que já são 4 por padrão).
 * Fazer os encaminhamentos (grande)
