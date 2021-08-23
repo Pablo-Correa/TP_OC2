@@ -85,8 +85,8 @@ module Control (
 
         // Controller signals
         casex (sel)  // RISCV "mini"                 
-             // op    fn              // 098765432109876543210
-            // 12'b000000100000: out <= 21'b00010100XX0100XXXXX00; // ADD
+             // op     f3 f7             // 098765432109876543210
+            17'b01100110000000000: out <= 21'b00010100XX0100XXXXX00; // ADD
             17'b0010011000XXXXXXX: out <= 21'b10000100XX0100XXXXX00; // ADDI
             // 12'b001001XXXXXX: out <= 21'b10000111XX0100XXXXX00; // ADDIU
             // 12'b100011XXXXXX: out <= 21'b10001110XX0100XXXXX10; // LW

@@ -180,7 +180,7 @@ module Decode (
                 id_iss_readmem <= readmem;
                 id_iss_writemem <= writemem;
                 id_iss_selwsource <= selwsource;
-                id_iss_regdest <= (selregdest) ? if_id_instruc[15:11] : if_id_instruc[20:16];
+                id_iss_regdest <= if_id_instruc[11:7];
                 id_iss_writereg <= writereg;
                 id_iss_writeov <= writeov;
                 // id_iss_imedext <= $signed(if_id_instruc[15:0]);
