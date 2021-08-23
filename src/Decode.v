@@ -34,8 +34,9 @@ module Decode (
 
     // Both may be used at Issue to determine which functional unit should be
     // used
-    output reg [6:0] id_iss_op,
-    output reg [6:0] id_iss_funct,
+    output reg [6:0] id_iss_opcode,
+    output reg [2:0] id_iss_funct3,
+    output reg [6:0] id_iss_funct7,
 
     // Keeps the current instruction
     input id_stall,
@@ -89,15 +90,15 @@ module Decode (
     wire [4:0] rs1, rs2, rd;
     wire [6:0] opcode;
     wire [2:0] funct3;
-    wire [9:0] funct;
+    wire [6:0] funct7;
     wire [31:0] ImmGen;
 
     assign opcode = if_id_instruc[6:0];
     assign rs1    = if_id_instruc[19:15];
     assign rs2    = if_id_instruc[24:20];
     assign rd     = if_id_instruc[11:7];
-    assign funct = {if_id_instruc[31:25],if_id_instruc[14:12]};
-    assign funct3 = {if_id_instruc[14:12]};
+    assign funct7 = if_id_instruc[31:25];
+    assign funct3 = if_id_instruc[14:12];
 
 
     assign id_if_rega = reg_id_ass_dataa;
@@ -117,11 +118,12 @@ module Decode (
         compop === 2'b00 || compop === 2'b01
     );
 
-    assign id_ass_waw_write_addr = (selregdest) ? if_id_instruc[15:11] : if_id_instruc[20:16];
+    // assign id_ass_waw_write_addr = (selregdest) ? if_id_instruc[15:11] : if_id_instruc[20:16];
+    assign id_ass_waw_write_addr = if_id_instruc[11:7];
     assign id_ass_waw_write_writereg = writereg;
 
     Comparator COMPARATOR(.a(reg_id_ass_dataa),.b(reg_id_ass_datab),.op(compop),.compout(compout));
-    Control CONTROL(.opcode(opcode),.funct3(funct3),.funct7(funct),
+    Control CONTROL(.opcode(opcode),.funct3(funct3),.funct7(funct7),
                     .selwsource(selwsource),.selregdest(selregdest),.writereg(writereg),
                     .writeov(writeov),.selimregb(selimregb),.selalushift(selalushift),
                     .aluop(aluop),.shiftop(shiftop),.readmem(readmem),.writemem(writemem),
@@ -137,6 +139,10 @@ module Decode (
             default: id_if_selpcsource <= 1'b0;
         endcase
     end
+
+    // ImmGen
+    wire    [17:0]    sel;
+    assign sel = {opcode,funct3,funct7};
 
     always @(posedge clock or negedge reset) begin
         if (~reset) begin
@@ -154,8 +160,9 @@ module Decode (
             id_iss_imedext <= 32'h0000_0000;
             id_iss_selregdest <= 1'b0;
 
-            id_iss_op <= 6'b000000;
-            id_iss_funct <= 6'b000000;
+            id_iss_opcode <= 7'b0000000;
+            id_iss_funct7 <= 7'b0000000;
+            id_iss_funct3 <= 3'b000;
 
             id_iss_addra <= 5'b00000;
             id_iss_addrb <= 5'b00000;
@@ -176,11 +183,24 @@ module Decode (
                 id_iss_regdest <= (selregdest) ? if_id_instruc[15:11] : if_id_instruc[20:16];
                 id_iss_writereg <= writereg;
                 id_iss_writeov <= writeov;
-                id_iss_imedext <= $signed(if_id_instruc[15:0]);
+                // id_iss_imedext <= $signed(if_id_instruc[15:0]);
                 id_iss_selregdest <= selregdest;
 
-                id_iss_op <= opcode;
-                id_iss_funct <= if_id_instruc[5:0];
+
+                casex (sel)                 
+                        // op    fn              // 098765432109876543210
+                    // 12'b000000100000: out <= 21'b00010100XX0100XXXXX00; // ADD
+                    17'b0010011000XXXXXXX: id_iss_imedext <= {{20{if_id_instruc[31]}},if_id_instruc[31:20]}; // ADDI
+                    // 12'b001001XXXXXX: out <= 21'b10000111XX0100XXXXX00; // ADDIU
+                    // 12'b100011XXXXXX: out <= 21'b10001110XX0100XXXXX10; // LW
+                    // 12'b101011XXXXXX: out <= 21'b100XX0X0XX0100XXXXX01; // SW
+                    // 12'b000000011000: out <= 21'b00010100XX0000XXXXX00; // MULT
+                    default:    id_iss_imedext <= 32'h0000_0000;
+                endcase
+
+                id_iss_opcode <= opcode;
+                id_iss_funct7 <= funct7;
+                id_iss_funct3 <= funct3;
 
                 id_iss_addra <= id_reg_addra;
                 id_iss_addrb <= id_reg_addrb;

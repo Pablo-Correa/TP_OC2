@@ -64,8 +64,9 @@ module Issue (
 
     // Opcode and funct, received from Decode in order to find out which func-
     // tional unit should be enabled
-    input [5:0] id_iss_op,
-    input [5:0] id_iss_funct,
+    input [6:0] id_iss_opcode,
+    input [6:0] id_iss_funct7,
+    input [2:0] id_iss_funct3,
 
     // Functional unit to be used
     output iss_am_oper,
@@ -201,10 +202,11 @@ module Issue (
     assign writeaddr = id_iss_regdest;
     assign enablewrite = id_iss_writereg && registerunit !== 2'b11 && !iss_stall;
 
-    assign registerunit = (id_iss_op === 6'b000000 && id_iss_funct === 6'b011000) ? 
-        2'b10 : (id_iss_op === 6'b101011 || id_iss_op === 6'b100011 ? 2'b01 : (
-        2'b00
-    ));
+    assign registerunit = 
+        (id_iss_opcode === 7'b0000001 && id_iss_funct7 === 7'b0110011) ? 2'b10 :
+            (id_iss_opcode === 7'b0100011 || id_iss_opcode === 7'b0000011 ? 2'b01 : 
+            (2'b00)
+        );
 
     always @(posedge clock or negedge reset) begin
         if (~reset) begin
@@ -242,12 +244,14 @@ module Issue (
             iss_ex_rega <= reg_iss_dataa;
             iss_ex_regb <= reg_iss_datab;
             prev_stall <= 1'b0;
-            if (id_iss_op === 6'b101011 || id_iss_op === 6'b100011) begin
-                // Load, store
+            if (id_iss_opcode === 7'b0100011 || id_iss_opcode === 7'b0000011) begin
+                // Store, load
                 functional_unit <= 2'b01;
-            end else if (id_iss_op === 6'b000000 && id_iss_funct === 6'b011000) begin
+            end else if (id_iss_opcode === 7'b0000001 && id_iss_funct7 === 7'b0110011) begin
+                // Mult
                 functional_unit <= 2'b10;
             end else begin
+                // ALU Misc
                 functional_unit <= 2'b00;
             end
         end else begin

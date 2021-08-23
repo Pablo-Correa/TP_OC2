@@ -82,8 +82,10 @@ module Mips (
     wire id_iss_writeov;
     wire id_iss_selregdest;
 
-    wire [5:0] id_iss_op;
-    wire [5:0] id_iss_funct;
+    wire [6:0] id_iss_opcode;
+    wire [6:0] id_iss_funct7;
+    wire [2:0] id_iss_funct3;
+
 
     wire [4:0] id_reg_addra;
     wire [4:0] id_reg_addrb;
@@ -131,8 +133,9 @@ module Mips (
         .id_iss_writeov(id_iss_writeov),
         .id_iss_selregdest(id_iss_selregdest),
 
-        .id_iss_op(id_iss_op),
-        .id_iss_funct(id_iss_funct),
+        .id_iss_opcode(id_iss_opcode),
+        .id_iss_funct7(id_iss_funct7),
+        .id_iss_funct3(id_iss_funct3),
 
         .id_stall(id_stall),
         .iss_stall(iss_stall),
@@ -233,8 +236,10 @@ module Mips (
 
         .id_iss_selregdest(id_iss_selregdest),
 
-        .id_iss_op(id_iss_op),
-        .id_iss_funct(id_iss_funct),
+        .id_iss_opcode(id_iss_opcode),
+        .id_iss_funct7(id_iss_funct7),
+        .id_iss_funct3(id_iss_funct3),
+
 
         .iss_am_oper(iss_am_oper),
         .iss_mem_oper(iss_mem_oper),
