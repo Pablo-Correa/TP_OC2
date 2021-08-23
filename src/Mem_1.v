@@ -25,6 +25,7 @@ module Mem_1 (
     assign data_addr = m0_m1_data_addr[8:2];
 
     wire data_wre;
+    // WRITE flag to memory module
     assign data_wre = !m0_m1_readmem & m0_m1_writemem;
 
     wire [31:0] data_data_out;
@@ -32,7 +33,9 @@ module Mem_1 (
     MemoryModule data_memory (
         .clk(clock),
         .addr(data_addr),
-        .data(data_data_out)
+        .data(data_data_out),
+        .data_in(m0_m1_regb),
+        .write_enable(data_wre)
     );
 
     // Ram data_ram (

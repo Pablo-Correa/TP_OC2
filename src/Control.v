@@ -85,12 +85,12 @@ module Control (
 
         // Controller signals
         casex (sel)  // RISCV "mini"                 
-             // op     f3 f7             // 098765432109876543210
+             // op     f3 f7               // 098765432109876543210
             17'b01100110000000000: out <= 21'b00010100XX0100XXXXX00; // ADD
             17'b0010011000XXXXXXX: out <= 21'b10000100XX0100XXXXX00; // ADDI
-            // 12'b001001XXXXXX: out <= 21'b10000111XX0100XXXXX00; // ADDIU
-            // 12'b100011XXXXXX: out <= 21'b10001110XX0100XXXXX10; // LW
-            // 12'b101011XXXXXX: out <= 21'b100XX0X0XX0100XXXXX01; // SW
+            // 17'b001001XXXXXX: out <=      21'b10000111XX0100XXXXX00; // ADDIU
+            17'b0000011010XXXXXXX: out <= 21'b10001110XX0100XXXXX10; // LW
+            17'b0100011010XXXXXXX: out <= 21'b100XX0X0XX0100XXXXX01; // SW
             // 12'b000000011000: out <= 21'b00010100XX0000XXXXX00; // MULT
             default:          out <= 21'b000000000000000000000;
         endcase

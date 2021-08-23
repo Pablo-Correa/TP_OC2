@@ -1,5 +1,5 @@
 /**
- * Testbench 2 - ADD e ADDI
+ * Testbench 3 - LW
  * 
  */
 
@@ -26,24 +26,39 @@ module Mips_TB;
         /* 
         Instruções:
         
-        addi x10, x5, 7
-        addi x11, x10, 8
-        add x12, x10, x11
-        addi x10, x0, 3 
+        addi x13, x0, 3
+        addi x14, x0, 0
+        lw x10, 0(x14)
+        lw x11, 4(x14)
+        add x12, x11, x10
+        sw x13, 12(x0)
+        sw x12, 8(x0)
         
         */
         // Coloca as instruções do arquivo na estrutura de memória de instruções
-        #10 $readmemh("../tb/riscv_tb2_adds.hex", 
+        #10 $readmemh("../tb/riscv_tb3_lw.hex", 
                       mips.FETCH.instruction_memory.mem);
+        #10 $readmemh("../tb/riscv_tb3_lw_reg_data.hex", 
+                      mips.MEM.MEM_1.data_memory.mem);
+                      
         // Faz o dump das formas de onda para análise posterior
-        $dumpfile("riscv_tb2_adds.vcd");
+        $dumpfile("riscv_tb3_lw.vcd");
         $dumpvars;
 
         // Imprime na tela alguns sinais escolhidos
-        $display("\t\tA\tB\tOut\tAluOP");
-        $monitor("\t%d%d%d\t%d", mips.ALUMISC.iss_am_rega,  mips.ALUMISC.iss_am_regb, mips.ALUMISC.aluout, mips.ALUMISC.iss_am_aluop);
+        $display("\t\t$s2\t$s3\t&8\t&12");
+        $monitor("\t%d%d%d\t%d",
+            mips.REGISTERS.registers[18],
+            mips.REGISTERS.registers[19],
+            mips.MEM.MEM_1.data_memory.mem[2],
+            mips.MEM.MEM_1.data_memory.mem[3]
+        );
 
-        #100 $finish;
+        // Termina depois de 100 ticks
+        #190 $writememh("riscv_tb3_lw_reg_data_out.hex", mips.MEM.MEM_1.data_memory.mem);
+
+        // Termina depois de 100 ticks
+        #200 $finish;
     end
 
     initial begin

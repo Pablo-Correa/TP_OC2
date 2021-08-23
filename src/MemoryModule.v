@@ -4,7 +4,9 @@
 // Instruction and Data Memory
 module MemoryModule(
     input       wire            clk,
-    input       wire    [6:0]   addr, 
+    input       wire    [6:0]   addr,
+    input       wire    [31:0]  data_in,
+    input       wire            write_enable,    
     output      wire    [31:0]  data
 );
     // 32-bit memory with 128 entries
@@ -12,6 +14,13 @@ module MemoryModule(
 	
     // Load requested address into data output
 	assign data = mem[addr];
+
+    // Store if enabled to do so
+    always @(posedge clk) begin
+        if (write_enable) begin
+            mem[addr] <= data_in[31:0];
+        end
+    end
 
     /* 
     // Old way of initializing memory, 

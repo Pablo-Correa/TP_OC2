@@ -37,7 +37,8 @@ module Fetch (
     MemoryModule instruction_memory (
         .clk(clock),
         .addr(instr_addr),
-        .data(instr_data)
+        .data(instr_data),
+        .write_enable(1'b0)
     );
     // We must remove this module, simplify it
     // Ram instr_ram (

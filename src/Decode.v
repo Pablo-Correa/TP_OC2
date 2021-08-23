@@ -192,8 +192,8 @@ module Decode (
                     // 12'b000000100000: out <= 21'b00010100XX0100XXXXX00; // ADD
                     17'b0010011000XXXXXXX: id_iss_imedext <= {{20{if_id_instruc[31]}},if_id_instruc[31:20]}; // ADDI
                     // 12'b001001XXXXXX: out <= 21'b10000111XX0100XXXXX00; // ADDIU
-                    // 12'b100011XXXXXX: out <= 21'b10001110XX0100XXXXX10; // LW
-                    // 12'b101011XXXXXX: out <= 21'b100XX0X0XX0100XXXXX01; // SW
+                    17'b0000011010XXXXXXX: id_iss_imedext <= {{20{if_id_instruc[31]}},if_id_instruc[31:20]}; // LW
+                    17'b0100011010XXXXXXX: id_iss_imedext <= {{20{if_id_instruc[31]}},if_id_instruc[31:25],if_id_instruc[11:7]}; // SW
                     // 12'b000000011000: out <= 21'b00010100XX0000XXXXX00; // MULT
                     default:    id_iss_imedext <= 32'h0000_0000;
                 endcase
